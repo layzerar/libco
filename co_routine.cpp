@@ -787,12 +787,9 @@ void co_eventloop( stCoEpoll_t *ctx,pfn_co_eventloop_t pfn,void *arg )
 
 			lp = active->head;
 		}
-		if( pfn )
+		if( pfn && !pfn( arg ) )
 		{
-			if( -1 == pfn( arg ) )
-			{
-				break;
-			}
+			break;
 		}
 
 	}
@@ -851,10 +848,6 @@ stCoRoutine_t *GetCurrThreadCo( )
 typedef int (*poll_pfn_t)(struct pollfd fds[], nfds_t nfds, int timeout);
 int co_poll_inner( stCoEpoll_t *ctx,struct pollfd fds[], nfds_t nfds, int timeout, poll_pfn_t pollfunc)
 {
-    if (timeout == 0)
-	{
-		return pollfunc(fds, nfds, timeout);
-	}
 	if (timeout < 0)
 	{
 		timeout = INT_MAX;

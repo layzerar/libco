@@ -43,7 +43,7 @@
 
 extern "C"
 {
-	extern void coctx_swap( coctx_t *,coctx_t* ) asm("coctx_swap");
+	extern void coctx_swap( coctx_t *,coctx_t* );
 };
 using namespace std;
 stCoRoutine_t *GetCurrCo( stCoRoutineEnv_t *env );

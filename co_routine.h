@@ -27,6 +27,7 @@
 struct stCoRoutine_t;
 struct stShareStack_t;
 
+#pragma pack(push, 1)
 struct stCoRoutineAttr_t
 {
 	int stack_size;
@@ -36,7 +37,8 @@ struct stCoRoutineAttr_t
 		stack_size = 128 * 1024;
 		share_stack = NULL;
 	}
-}__attribute__ ((packed));
+};
+#pragma pack(pop)
 
 struct stCoEpoll_t;
 typedef int (*pfn_co_eventloop_t)(void *);

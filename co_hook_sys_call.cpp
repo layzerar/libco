@@ -155,6 +155,7 @@ static inline unsigned long long get_tick_count()
 	return ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
 }
 
+#pragma pack(push, 1)
 struct rpchook_connagent_head_t
 {
     unsigned char    bVersion;
@@ -164,8 +165,8 @@ struct rpchook_connagent_head_t
     unsigned int     iOssAttrID;
     unsigned char    bIsRespNotExist;
 	unsigned char    sReserved[6];
-}__attribute__((packed));
-
+};
+#pragma pack(pop)
 
 #define HOOK_SYS_FUNC(name) if( !g_sys_##name##_func ) { g_sys_##name##_func = (name##_pfn_t)dlsym(RTLD_NEXT,#name); }
 

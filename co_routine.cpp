@@ -114,40 +114,6 @@ static unsigned long long GetTickMS()
 #endif
 }
 
-static pid_t GetPid()
-{
-    static __thread pid_t pid = 0;
-    static __thread pid_t tid = 0;
-    if( !pid || !tid || pid != getpid() )
-    {
-        pid = getpid();
-#if defined( __APPLE__ )
-		tid = syscall( SYS_gettid );
-		if( -1 == (long)tid )
-		{
-			tid = pid;
-		}
-#elif defined( __FreeBSD__ )
-		syscall(SYS_thr_self, &tid);
-		if( tid < 0 )
-		{
-			tid = pid;
-		}
-#else 
-        tid = syscall( __NR_gettid );
-#endif
-
-    }
-    return tid;
-
-}
-/*
-static pid_t GetPid()
-{
-	char **p = (char**)pthread_self();
-	return p ? *(pid_t*)(p + 18) : getpid();
-}
-*/
 template <class T,class TLink>
 void RemoveFromLink(T *ap)
 {
@@ -520,10 +486,6 @@ struct stCoRoutine_t *co_create_env( stCoRoutineEnv_t * env, const stCoRoutineAt
 
 int co_create( stCoRoutine_t **ppco,const stCoRoutineAttr_t *attr,pfn_co_routine_t pfn,void *arg )
 {
-	if( !co_get_curr_thread_env() ) 
-	{
-		co_init_curr_thread_env();
-	}
 	stCoRoutine_t *co = co_create_env( co_get_curr_thread_env(), attr, pfn,arg );
 	*ppco = co;
 	return 0;
@@ -701,13 +663,8 @@ static short EpollEvent2Poll( uint32_t events )
 	return e;
 }
 
-static stCoRoutineEnv_t* g_arrCoEnvPerThread[ 204800 ] = { 0 };
-void co_init_curr_thread_env()
+void co_init_curr_thread_env( stCoRoutineEnv_t *env )
 {
-	pid_t pid = GetPid();	
-	g_arrCoEnvPerThread[ pid ] = (stCoRoutineEnv_t*)calloc( 1,sizeof(stCoRoutineEnv_t) );
-	stCoRoutineEnv_t *env = g_arrCoEnvPerThread[ pid ];
-
 	env->iCallStackSize = 0;
 	struct stCoRoutine_t *self = co_create_env( env, NULL, NULL,NULL );
 	self->cIsMain = 1;
@@ -724,7 +681,15 @@ void co_init_curr_thread_env()
 }
 stCoRoutineEnv_t *co_get_curr_thread_env()
 {
-	return g_arrCoEnvPerThread[ GetPid() ];
+	static __thread pid_t pid = 0;
+	static __thread stCoRoutineEnv_t *env = NULL;
+	if ( !env || pid != getpid())
+	{
+		pid = getpid();
+		env = (stCoRoutineEnv_t*)calloc( 1,sizeof(stCoRoutineEnv_t) );
+		co_init_curr_thread_env( env );
+	}
+	return env;
 }
 
 void OnPollProcessEvent( stTimeoutItem_t * ap )
@@ -1002,10 +967,6 @@ void SetEpoll( stCoRoutineEnv_t *env,stCoEpoll_t *ev )
 }
 stCoEpoll_t *co_get_epoll_ct()
 {
-	if( !co_get_curr_thread_env() )
-	{
-		co_init_curr_thread_env();
-	}
 	return co_get_curr_thread_env()->pEpoll;
 }
 struct stHookPThreadSpec_t

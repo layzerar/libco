@@ -77,7 +77,6 @@ struct stCoRoutine_t
 
 
 //1.env
-void 				co_init_curr_thread_env();
 stCoRoutineEnv_t *	co_get_curr_thread_env();
 
 //2.coroutine

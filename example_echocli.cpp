@@ -27,6 +27,7 @@
 #include <time.h>
 #include <stack>
 
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>

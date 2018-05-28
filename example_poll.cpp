@@ -24,6 +24,7 @@
 #include <sys/time.h>
 #include <stack>
 
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>
@@ -132,7 +133,7 @@ static void *poll_routine( void *arg )
 	size_t iWaitCnt = v.size();
 	for(;;)
 	{
-		int ret = poll( pf,iWaitCnt,1000 );
+		int ret = co_poll_ct( pf,iWaitCnt,1000 );
 		printf("co %p poll wait %ld ret %d\n",
 				co_self(),iWaitCnt,ret);
 		for(int i=0;i<ret;i++)

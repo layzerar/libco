@@ -24,7 +24,6 @@
 #include <string.h>
 #include "coctx.h"
 #include "co_routine.h"
-#include "co_routine_inner.h"
 
 void* RoutineFunc(void* args)
 {
@@ -36,7 +35,7 @@ void* RoutineFunc(void* args)
 		sprintf(sBuff, "from routineid %d stack addr %p\n", *routineid, sBuff);
 
 		printf("%s", sBuff);
-		poll(NULL, 0, 1000); //sleep 1s
+		co_poll_ct(NULL, 0, 1000); //sleep 1s
 	}
 	return NULL;
 }

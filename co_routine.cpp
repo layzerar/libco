@@ -33,6 +33,7 @@
 #include <assert.h>
 
 #include <fcntl.h>
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -829,6 +830,11 @@ void FreeEpoll( stCoEpoll_t *ctx )
 	free( ctx );
 }
 
+void SetEpoll( stCoRoutineEnv_t *env,stCoEpoll_t *ev )
+{
+	env->pEpoll = ev;
+}
+
 stCoRoutine_t *GetCurrCo( stCoRoutineEnv_t *env )
 {
 	return env->pCallStack[ env->iCallStackSize - 1 ];
@@ -956,19 +962,21 @@ int co_poll_inner( stCoEpoll_t *ctx,struct pollfd fds[], nfds_t nfds, int timeou
 	return iRaiseCnt;
 }
 
-int	co_poll( stCoEpoll_t *ctx,struct pollfd fds[], nfds_t nfds, int timeout_ms )
+int	co_poll( stCoEpoll_t *ctx,struct pollfd fds[], unsigned int nfds, int timeout_ms )
 {
-	return co_poll_inner(ctx, fds, nfds, timeout_ms, NULL);
+	return co_poll_inner(ctx, fds, (nfds_t)nfds, timeout_ms, NULL);
 }
 
-void SetEpoll( stCoRoutineEnv_t *env,stCoEpoll_t *ev )
+int	co_poll_ct( struct pollfd fds[], unsigned int nfds, int timeout_ms )
 {
-	env->pEpoll = ev;
+	return co_poll_inner(co_get_epoll_ct(), fds, (nfds_t)nfds, timeout_ms, NULL);
 }
+
 stCoEpoll_t *co_get_epoll_ct()
 {
 	return co_get_curr_thread_env()->pEpoll;
 }
+
 struct stHookPThreadSpec_t
 {
 	stCoRoutine_t *co;

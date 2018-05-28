@@ -26,6 +26,7 @@
 #include <sys/time.h>
 #include <stack>
 
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>
@@ -119,7 +120,7 @@ static void *accept_routine( void * )
 			printf("empty\n"); //sleep
 			struct pollfd pf = { 0 };
 			pf.fd = -1;
-			poll( &pf,1,1000);
+			co_poll_ct( &pf,1,1000);
 
 			continue;
 

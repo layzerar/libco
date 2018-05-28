@@ -20,8 +20,7 @@
 #define __CO_ROUTINE_H__
 
 #include <stdint.h>
-#include <sys/poll.h>
-#include <pthread.h>
+#include <stddef.h>
 
 //1.struct
 
@@ -53,13 +52,9 @@ void    co_release( stCoRoutine_t *co );
 
 stCoRoutine_t *co_self();
 
-int		co_poll( stCoEpoll_t *ctx,struct pollfd fds[], nfds_t nfds, int timeout_ms );
+int		co_poll( stCoEpoll_t *ctx,struct pollfd fds[], unsigned int nfds, int timeout_ms );
+int		co_poll_ct( struct pollfd fds[], unsigned int nfds, int timeout_ms );
 void 	co_eventloop( stCoEpoll_t *ctx,pfn_co_eventloop_t pfn,void *arg );
-
-//3.specific
-
-int 	co_setspecific( pthread_key_t key, const void *value );
-void *	co_getspecific( pthread_key_t key );
 
 //4.event
 
@@ -88,5 +83,5 @@ stShareStack_t* co_alloc_sharestack(int iCount, int iStackSize);
 void co_set_env_list( const char *name[],size_t cnt);
 
 void co_log_err( const char *fmt,... );
-#endif
 
+#endif  // __CO_ROUTINE_H__

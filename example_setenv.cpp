@@ -37,7 +37,7 @@ void SetAndGetEnv(int iRoutineID)
 	printf("routineid %d begin\n", iRoutineID);
 
 	//use poll as sleep
-	poll(NULL, 0, 500);
+	co_poll_ct(NULL, 0, 500);
 
 	char sBuf[128];
 	sprintf(sBuf, "cgi_routine_%d", iRoutineID);
@@ -50,7 +50,7 @@ void SetAndGetEnv(int iRoutineID)
 	}
 	printf("routineid %d set env CGINAME %s\n", iRoutineID, sBuf);
 
-	poll(NULL, 0, 500);
+	co_poll_ct(NULL, 0, 500);
 
 	char* env = getenv("CGINAME");
 	if (!env)

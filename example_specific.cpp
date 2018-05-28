@@ -43,7 +43,7 @@ void* RoutineFunc(void* args)
 	while (true)
 	{
 		printf("%s:%d routine specific data idx %d\n", __func__, __LINE__, __routine->idx);
-		poll(NULL, 0, 1000);
+		co_poll_ct(NULL, 0, 1000);
 	}
 	return NULL;
 }
